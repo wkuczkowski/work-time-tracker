@@ -25,5 +25,5 @@ alwaysApply: true
 ## Linting
 
 - ESLint is configured for `.js` files only
-- EJS files are excluded from linting (EJS template syntax cannot be reliably parsed by ESLint)
+- EJS files are excluded from linting
 - Run `npm run lint` to check all JS files, `npm run lint:fix` to auto-fix issues

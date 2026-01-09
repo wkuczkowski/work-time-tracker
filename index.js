@@ -126,16 +126,15 @@ app.use(express.urlencoded({ extended: false }));
 // Parse signed cookies for CSRF double-submit cookie pattern
 app.use(cookieParser(process.env.CSRF_COOKIE_SECRET));
 
-// Serve static files with caching headers
-app.use(express.static(path.join(__dirname, "public"), {
-  maxAge: '7d', // 7 days for all static assets
-  setHeaders: (res, filePath) => {
-    // Add immutable for versioned assets (with query strings)
-    if (filePath.includes('?v=')) {
-      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
-    }
-  }
-}));
+// Serve static files with appropriate caching
+// Versioned URLs (via versionedAsset helper) will bust cache on each deployment
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: "1y", // Long cache - versioned URLs will bust it
+    immutable: true,
+    etag: true,
+  })
+);
 
 // auth router attaches /login, /logout, and /callback routes to the baseURL
 // Must come AFTER cookie-parser to properly handle session cookies

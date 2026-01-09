@@ -1,129 +1,86 @@
 <%- layout('layouts/main') %>
 
-<div class="px-4 py-5 sm:px-6">
-  <div class="flex justify-between items-center mb-6">
-    <div class="flex items-center space-x-4">
-      <h2 class="text-2xl font-bold text-gray-900">
+<div class="max-w-full mx-auto px-4 py-5 sm:px-6">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
+        <div class="p-2 bg-cyan-50 rounded-lg text-cyan-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
         Urlopy pracowników
-      </h2>
-      <div class="flex space-x-2">
-        <a
-          href="/holidays/employees/by-person?month=<%= month %>&year=<%= year %>"
-          class="text-sm px-3 py-1 rounded-md <%= currentView === 'by-person' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
-          >Wg osoby</a
-        >
-        <a
-        href="/holidays/employees/by-date?month=<%= month %>&year=<%= year %>"
-        class="text-sm px-3 py-1 rounded-md <%= currentView === 'by-date' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>"
-        >Wg daty</a
-        >
-      </div>
+      </h1>
+      <p class="text-gray-500 mt-1 text-sm ml-[52px]">Przegląd urlopów i pracy zdalnej pracowników.</p>
     </div>
-    <div class="flex items-center space-x-4">
-      <!-- Month Navigation -->
-      <div class="flex items-center space-x-1" id="monthNavigation" 
-           data-current-month="<%= month %>" data-current-year="<%= year %>">
-        <!-- Previous month button -->
-        <button id="navigatePrevMonth" 
-                class="p-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-        </button>
-        
-        <!-- Previous month -->
-        <a href="#" id="prevMonthBtn" 
-           class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600">
-        </a>
-        
-        <!-- Current month -->
-        <a href="#" id="currentMonthBtn" class="px-3 py-2 text-sm rounded-md font-medium">
-        </a>
-        
-        <!-- Next month -->
-        <a href="#" id="nextMonthBtn" 
-           class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600">
-        </a>
-        
-        <!-- Next month button -->
-        <button id="navigateNextMonth" 
-                class="p-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </button>
+
+    <!-- Month Navigation -->
+    <div class="flex items-center bg-gray-50 p-1 rounded-lg border border-gray-200 shadow-sm" id="monthNavigation"
+         data-current-month="<%= month %>" data-current-year="<%= year %>">
+      <button id="navigatePrevMonth" class="p-1.5 rounded-md hover:bg-white hover:shadow-sm text-gray-500 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <div class="flex items-center px-2 gap-1">
+        <a href="#" id="prevMonthBtn" class="hidden md:block px-2 py-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"></a>
+        <span id="currentMonthBtn" class="px-3 py-1 text-sm font-bold text-gray-900"></span>
+        <a href="#" id="nextMonthBtn" class="hidden md:block px-2 py-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"></a>
       </div>
+      <button id="navigateNextMonth" class="p-1.5 rounded-md hover:bg-white hover:shadow-sm text-gray-500 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
     </div>
   </div>
 
-  <!-- Navigation links -->
-  <div class="mb-10">
-    <div class="flex space-x-4">
-      <a href="/holidays" class="text-blue-600 font-medium hover:text-blue-800"
-        >Bieżący miesiąc</a
-      >
-      <a
-        href="/holidays/future"
-        class="text-blue-600 font-medium hover:text-blue-800"
-        >Przyszłe urlopy</a
-      >
-      <a
-        href="/holidays/history"
-        class="text-blue-600 font-medium hover:text-blue-800"
-        >Historia urlopów</a
-      >
+  <!-- View toggle and navigation tabs -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div class="inline-flex items-center bg-gray-50 p-1 rounded-lg border border-gray-200 shadow-sm">
+      <a href="/holidays" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+        Bieżący miesiąc
+      </a>
+      <a href="/holidays/future" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+        Przyszłe urlopy
+      </a>
+      <a href="/holidays/history" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+        Historia urlopów
+      </a>
+    </div>
+
+    <!-- View mode toggle -->
+    <div class="inline-flex items-center bg-gray-50 p-1 rounded-lg border border-gray-200 shadow-sm">
+      <a href="/holidays/employees/by-person?month=<%= month %>&year=<%= year %>"
+         class="px-4 py-2 rounded-md text-sm font-medium <%= currentView === 'by-person' ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-gray-500 hover:text-gray-900' %> transition-all">
+        Wg osoby
+      </a>
+      <a href="/holidays/employees/by-date?month=<%= month %>&year=<%= year %>"
+         class="px-4 py-2 rounded-md text-sm font-medium <%= currentView === 'by-date' ? 'bg-white shadow-sm text-blue-700 font-bold' : 'text-gray-500 hover:text-gray-900' %> transition-all">
+        Wg daty
+      </a>
     </div>
   </div>
 
   <!-- Legend -->
-  <div class="mb-6 bg-white p-5 rounded-lg shadow border border-gray-100">
-    <div
-      class="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
+  <div class="mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
       <h3 class="text-lg font-bold text-gray-800 flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 mr-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         Legenda:
       </h3>
       <div class="mt-2 md:mt-0 flex items-center space-x-4">
-        <div
-          class="text-sm font-medium bg-red-50 rounded-lg px-3 py-1.5 border border-red-100 flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 mr-1 text-red-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        <div class="text-sm font-medium bg-red-50 rounded-lg px-3 py-1.5 border border-red-100 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
           <span class="font-bold text-red-600"><%= totalEmployeesWithHolidays %></span>
         </div>
-        <div
-          class="text-sm font-medium bg-cyan-50 rounded-lg px-3 py-1.5 border border-cyan-100 flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 mr-1 text-cyan-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        <div class="text-sm font-medium bg-cyan-50 rounded-lg px-3 py-1.5 border border-cyan-100 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
           <span class="font-bold text-cyan-600"><%= totalEmployeesWithRemoteWork %></span>
         </div>
@@ -131,59 +88,45 @@
     </div>
     <div class="flex flex-wrap gap-4 justify-start">
       <div class="flex items-center p-2 rounded">
-        <div
-          class="w-6 h-6 bg-green-100 mr-2 rounded border border-green-200"></div>
+        <div class="w-6 h-6 bg-green-100 mr-2 rounded border border-green-200"></div>
         <span class="text-sm font-medium text-gray-700">Dzień pracujący</span>
       </div>
       <div class="flex items-center p-2 rounded">
-        <div
-          class="w-6 h-6 bg-cyan-100 mr-2 rounded border border-cyan-200 flex items-center justify-center">
+        <div class="w-6 h-6 bg-cyan-100 mr-2 rounded border border-cyan-200 flex items-center justify-center">
           <span class="text-xs font-bold text-cyan-600">z</span>
         </div>
         <span class="text-sm font-medium text-gray-700">Praca zdalnie</span>
       </div>
       <div class="flex items-center p-2 rounded">
-        <div
-          class="w-6 h-6 bg-red-100 mr-2 rounded border border-red-200 flex items-center justify-center">
+        <div class="w-6 h-6 bg-red-100 mr-2 rounded border border-red-200 flex items-center justify-center">
           <span class="text-xs font-bold text-red-300">u</span>
         </div>
         <span class="text-sm font-medium text-gray-700">Urlop</span>
       </div>
       <div class="flex items-center p-2 rounded">
-        <div
-          class="w-6 h-6 bg-purple-100 mr-2 rounded border border-purple-200"></div>
+        <div class="w-6 h-6 bg-purple-100 mr-2 rounded border border-purple-200"></div>
         <span class="text-sm font-medium text-gray-700">Święto</span>
       </div>
       <div class="flex items-center p-2 rounded">
-        <div
-          class="w-6 h-6 bg-gray-100 mr-2 rounded border border-gray-200"></div>
+        <div class="w-6 h-6 bg-gray-100 mr-2 rounded border border-gray-200"></div>
         <span class="text-sm font-medium text-gray-700">Weekend</span>
       </div>
     </div>
   </div>
 
   <!-- Search bar and filters -->
-  <div class="mb-6 bg-white p-5 rounded-lg shadow border border-gray-100">
+  <div class="mb-6 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-sm font-medium text-gray-700">Filtruj:</span>
-        <button
-          id="filterAll"
-          class="px-3 py-1.5 text-sm rounded-md bg-blue-500 text-white font-medium"
-          data-filter="all">
+        <button id="filterAll" class="px-3 py-1.5 text-sm rounded-md bg-blue-500 text-white font-medium" data-filter="all">
           Wszystkie
         </button>
-        <button
-          id="filterHolidays"
-          class="px-3 py-1.5 text-sm rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium"
-          data-filter="holidays">
+        <button id="filterHolidays" class="px-3 py-1.5 text-sm rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium" data-filter="holidays">
           <span class="text-xs font-bold text-red-300 mr-1">u</span>
           Urlopy
         </button>
-        <button
-          id="filterRemote"
-          class="px-3 py-1.5 text-sm rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium"
-          data-filter="remote">
+        <button id="filterRemote" class="px-3 py-1.5 text-sm rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium" data-filter="remote">
           <span class="text-xs font-bold text-cyan-600 mr-1">z</span>
           Zdalne
         </button>
@@ -194,17 +137,10 @@
         type="text"
         id="employeeSearch"
         placeholder="Szukaj pracownika..."
-        class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      <div
-        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg
-          class="h-5 w-5 text-gray-400"
-          fill="currentColor"
-          viewBox="0 0 20 20">
-          <path
-            fill-rule="evenodd"
-            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-            clip-rule="evenodd"></path>
+        class="w-full px-4 py-3 pl-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm shadow-sm bg-gray-50 hover:bg-white transition-colors" />
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
         </svg>
       </div>
     </div>
@@ -235,7 +171,7 @@
               </span>
             </div>
           </div>
-          
+
           <!-- Group table -->
           <table class="min-w-full divide-y divide-gray-200">
             <colgroup>
@@ -280,19 +216,19 @@
                 </th>
 
                 <!-- Day headers -->
-                <% daysInMonth.forEach(date => { 
+                <% daysInMonth.forEach(date => {
                   const dayDate = new Date(date);
-                  const dayOfWeek = dayDate.getDay(); 
-                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; 
+                  const dayOfWeek = dayDate.getDay();
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                   const dateKey = date.split('T')[0];
-                  const isPublicHoliday = publicHolidays[dateKey]; 
-                  let headerClass = "px-1 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"; 
-                  if (isWeekend) { 
-                    headerClass += " bg-gray-100"; 
-                  } else if (isPublicHoliday) { 
-                    headerClass += " bg-purple-100"; 
-                  } 
-                  let headerTitle = isPublicHoliday ? isPublicHoliday : ''; 
+                  const isPublicHoliday = publicHolidays[dateKey];
+                  let headerClass = "px-1 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider";
+                  if (isWeekend) {
+                    headerClass += " bg-gray-100";
+                  } else if (isPublicHoliday) {
+                    headerClass += " bg-purple-100";
+                  }
+                  let headerTitle = isPublicHoliday ? isPublicHoliday : '';
                 %>
                 <th
                   scope="col"
@@ -361,37 +297,37 @@
                   </td>
 
                   <!-- Holiday status for each day -->
-                  <% 
-                    daysInMonth.forEach(date => { 
-                      const isHoliday = employee.holidays.includes(date); 
+                  <%
+                    daysInMonth.forEach(date => {
+                      const isHoliday = employee.holidays.includes(date);
                       const dayDate = new Date(date);
-                      const dayOfWeek = dayDate.getDay(); 
-                      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; 
+                      const dayOfWeek = dayDate.getDay();
+                      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                       const dateKey = date.split('T')[0];
-                      const isPublicHoliday = publicHolidays[dateKey]; 
+                      const isPublicHoliday = publicHolidays[dateKey];
                       const workLocation = employee.workLocations ? employee.workLocations[dateKey] : undefined;
                       const isRemote = workLocation === false; // is_onsite === false means remote
-                      
-                      let cellClass = ""; 
-                      let tooltip = ''; 
+
+                      let cellClass = "";
+                      let tooltip = '';
                       let showIndicator = null;
-                      
-                      if (isHoliday) { 
-                        cellClass += " bg-red-100"; 
-                        tooltip = 'Urlop'; 
+
+                      if (isHoliday) {
+                        cellClass += " bg-red-100";
+                        tooltip = 'Urlop';
                         showIndicator = 'u';
-                      } else if (isWeekend) { 
-                        cellClass += " bg-gray-100"; 
-                      } else if (isPublicHoliday) { 
-                        cellClass += " bg-purple-100"; 
-                        tooltip = `Święto: ${isPublicHoliday}`; 
+                      } else if (isWeekend) {
+                        cellClass += " bg-gray-100";
+                      } else if (isPublicHoliday) {
+                        cellClass += " bg-purple-100";
+                        tooltip = `Święto: ${isPublicHoliday}`;
                       } else if (isRemote) {
                         cellClass += " bg-cyan-100";
                         tooltip = 'Praca zdalnie';
                         showIndicator = 'z';
-                      } else { 
-                        cellClass += " bg-green-100"; 
-                      } 
+                      } else {
+                        cellClass += " bg-green-100";
+                      }
                   %>
                   <td
                     class="<%= cellClass.trim() %>"
@@ -452,62 +388,36 @@
   const selectedYear = parseInt(document.getElementById('monthNavigation').dataset.currentYear);
   let displayMonth = selectedMonth;
   let displayYear = selectedYear;
-  
+
   function getMonthName(month, year) {
+    return new Date(year, month - 1, 1).toLocaleString('pl-PL', { month: 'long' });
+  }
+
+  function getShortMonthName(month, year) {
     return new Date(year, month - 1, 1).toLocaleString('pl-PL', { month: 'short' });
   }
-  
+
   function updateMonthDisplay() {
     const prevMonth = displayMonth === 1 ? 12 : displayMonth - 1;
     const prevYear = displayMonth === 1 ? displayYear - 1 : displayYear;
     const nextMonth = displayMonth === 12 ? 1 : displayMonth + 1;
     const nextYear = displayMonth === 12 ? displayYear + 1 : displayYear;
-    
+
     // Update button texts
-    document.getElementById('prevMonthBtn').textContent = getMonthName(prevMonth, prevYear) + ' ' + prevYear;
-    document.getElementById('currentMonthBtn').textContent = getMonthName(displayMonth, displayYear) + ' ' + displayYear;
-    document.getElementById('nextMonthBtn').textContent = getMonthName(nextMonth, nextYear) + ' ' + nextYear;
-    
+    document.getElementById('prevMonthBtn').textContent = getShortMonthName(prevMonth, prevYear);
+
+    // Capitalize first letter of current month
+    const currentMonthName = getMonthName(displayMonth, displayYear);
+    const capitalizedMonth = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
+    document.getElementById('currentMonthBtn').textContent = capitalizedMonth + ' ' + displayYear;
+
+    document.getElementById('nextMonthBtn').textContent = getShortMonthName(nextMonth, nextYear);
+
     // Update button links
     document.getElementById('prevMonthBtn').href = `/holidays/employees/by-person?month=${prevMonth}&year=${prevYear}`;
-    document.getElementById('currentMonthBtn').href = `/holidays/employees/by-person?month=${displayMonth}&year=${displayYear}`;
     document.getElementById('nextMonthBtn').href = `/holidays/employees/by-person?month=${nextMonth}&year=${nextYear}`;
-    
-    // Update styling - highlight whichever button represents the actually selected month
-    const prevBtn = document.getElementById('prevMonthBtn');
-    const currentBtn = document.getElementById('currentMonthBtn');
-    const nextBtn = document.getElementById('nextMonthBtn');
-    
-    // Reset all buttons to default styling
-    const defaultClass = "px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md font-medium";
-    const middleDefaultClass = "px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md font-bold";
-    const selectedClass = "px-3 py-2 text-sm bg-blue-500 text-white rounded-md font-medium cursor-default";
-    const selectedMiddleClass = "px-3 py-2 text-sm bg-blue-500 text-white rounded-md font-bold cursor-default";
-    
-    // Check which button represents the selected month and highlight it
-    if (prevMonth === selectedMonth && prevYear === selectedYear) {
-      prevBtn.className = selectedClass;
-      prevBtn.removeAttribute('href');
-      currentBtn.className = middleDefaultClass;
-      nextBtn.className = defaultClass;
-    } else if (displayMonth === selectedMonth && displayYear === selectedYear) {
-      prevBtn.className = defaultClass;
-      currentBtn.className = selectedMiddleClass;
-      currentBtn.removeAttribute('href');
-      nextBtn.className = defaultClass;
-    } else if (nextMonth === selectedMonth && nextYear === selectedYear) {
-      prevBtn.className = defaultClass;
-      currentBtn.className = middleDefaultClass;
-      nextBtn.className = selectedClass;
-      nextBtn.removeAttribute('href');
-    } else {
-      // None of the visible buttons represent the selected month
-      prevBtn.className = defaultClass;
-      currentBtn.className = middleDefaultClass;
-      nextBtn.className = defaultClass;
-    }
   }
-  
+
   function navigateMonth(direction) {
     if (direction === -1) {
       if (displayMonth === 1) {
@@ -524,29 +434,30 @@
         displayMonth++;
       }
     }
-    updateMonthDisplay();
+    // Navigate
+    window.location.href = `/holidays/employees/by-person?month=${displayMonth}&year=${displayYear}`;
   }
 
   document.addEventListener("DOMContentLoaded", function () {
     // Initialize month display
     updateMonthDisplay();
-    
+
     // Month navigation buttons
     const navigatePrevBtn = document.getElementById('navigatePrevMonth');
     const navigateNextBtn = document.getElementById('navigateNextMonth');
-    
+
     if (navigatePrevBtn) {
       navigatePrevBtn.addEventListener('click', function() {
         navigateMonth(-1);
       });
     }
-    
+
     if (navigateNextBtn) {
       navigateNextBtn.addEventListener('click', function() {
         navigateMonth(1);
       });
     }
-    
+
     const searchInput = document.getElementById("employeeSearch");
     const employeeRows = document.querySelectorAll(".employee-row");
     const groupContainers = document.querySelectorAll(".group-container");
@@ -586,9 +497,9 @@
       groupContainers.forEach((groupContainer) => {
         const groupId = groupContainer.dataset.groupId;
         const groupEmployeeRows = document.querySelectorAll(`.employee-row[data-group-id="${groupId}"]`);
-        
+
         // Check if any employee in this group is visible
-        const hasVisibleEmployees = Array.from(groupEmployeeRows).some(row => 
+        const hasVisibleEmployees = Array.from(groupEmployeeRows).some(row =>
           row.style.display !== "none"
         );
 

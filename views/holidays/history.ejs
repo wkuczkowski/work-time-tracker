@@ -1,97 +1,109 @@
 <%- layout('layouts/main') %>
 
-<div class="bg-white rounded-lg shadow p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-900">Historia urlopów</h2>
+<div class="max-w-7xl mx-auto">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
+        <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        Historia urlopów
+      </h1>
+      <p class="text-gray-500 mt-1 text-sm ml-[52px]">Przeglądaj swoje poprzednie urlopy.</p>
+    </div>
   </div>
 
-  <!-- Navigation links for holiday views -->
-  <div class="flex space-x-4 mb-6">
-    <a href="/holidays" class="text-blue-600 font-medium hover:text-blue-800"
-      >Bieżący miesiąc</a
-    >
-    <a
-      href="/holidays/future"
-      class="text-blue-600 font-medium hover:text-blue-800"
-      >Przyszłe urlopy</a
-    >
-    <a
-      href="/holidays/history"
-      class="text-blue-600 font-medium underline hover:text-blue-800"
-      >Historia urlopów</a
-    >
-    <a
-      href="/holidays/employees/by-person"
-      class="text-blue-600 font-medium hover:text-blue-800"
-      >Urlopy/zdalne pracowników</a
-    >
+  <!-- Navigation tabs -->
+  <div class="mb-8">
+    <div class="inline-flex items-center bg-gray-50 p-1 rounded-lg border border-gray-200 shadow-sm">
+      <a href="/holidays" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+        Bieżący miesiąc
+      </a>
+      <a href="/holidays/future" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+        Przyszłe urlopy
+      </a>
+      <a href="/holidays/history" class="px-4 py-2 rounded-md text-sm font-bold bg-white shadow-sm text-blue-700 transition-all">
+        Historia urlopów
+      </a>
+      <a href="/holidays/employees/by-person" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
+        Urlopy pracowników
+      </a>
+    </div>
   </div>
 
   <% if (messages.error) { %>
-  <div
-    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-    role="alert">
-    <span class="block sm:inline"><%= messages.error %></span>
+  <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center gap-2">
+    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+    <span><%= messages.error %></span>
   </div>
   <% } %>
 
   <!-- List of past holidays -->
-  <div>
-    <h3 class="text-lg font-medium text-gray-900 mb-4">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
+      <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
       Twoje poprzednie urlopy
     </h3>
 
-    <% if (Object.keys(holidaysByMonth).length > 0) { %> <%
-    Object.keys(holidaysByMonth).sort().reverse().forEach(monthKey => { %>
-    <div class="mb-6">
-      <h4 class="text-md font-medium text-gray-700 mb-2 border-b pb-2">
-        <%= holidaysByMonth[monthKey].name %>
-      </h4>
+    <% if (Object.keys(holidaysByMonth).length > 0) { %>
+    <div class="space-y-6">
+      <% Object.keys(holidaysByMonth).sort().reverse().forEach(monthKey => { %>
+      <div>
+        <!-- Month header -->
+        <div class="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span class="text-sm font-bold text-gray-700 uppercase tracking-wide"><%= holidaysByMonth[monthKey].name %></span>
+          <span class="text-xs text-gray-400">(<%= holidaysByMonth[monthKey].holidays.length %> dni)</span>
+        </div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Data
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Akcje
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <% holidaysByMonth[monthKey].holidays.forEach(holiday => { %>
-            <tr>
-              <td
-                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                <%= holiday.holiday_date %>
-              </td>
-              <td
-                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <form
-                  action="/holidays/<%= holiday.id %>/delete"
-                  method="POST"
-                  class="inline delete-holiday-form">
+        <!-- Holiday cards for this month -->
+        <div class="space-y-2">
+          <% holidaysByMonth[monthKey].holidays.forEach(holiday => { %>
+          <div class="group p-3 rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all bg-white">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="p-1.5 bg-purple-50 rounded-md">
+                  <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div class="text-sm font-medium text-gray-900"><%= holiday.holiday_date %></div>
+                <div class="text-xs text-gray-500"><%= new Date(holiday.holiday_date).toLocaleDateString('pl-PL', { weekday: 'long' }) %></div>
+              </div>
+
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                <form action="/holidays/<%= holiday.id %>/delete" method="POST" class="inline delete-holiday-form">
                   <%- include('../partials/csrf-field') %>
-                  <button type="submit" class="text-red-600 hover:text-red-800">
-                    Usuń
+                  <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Usuń">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 </form>
-              </td>
-            </tr>
-            <% }); %>
-          </tbody>
-        </table>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
       </div>
+      <% }); %>
     </div>
-    <% }); %> <% } else { %>
-    <div class="bg-gray-50 rounded-lg p-4">
-      <p class="text-gray-700">Brak historii urlopów.</p>
+    <% } else { %>
+    <div class="text-center py-8">
+      <div class="bg-gray-50 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-sm text-gray-500">Brak historii urlopów.</p>
     </div>
     <% } %>
   </div>

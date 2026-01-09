@@ -68,7 +68,7 @@ router.get("/", async (req, res) => {
     const firstDay = startDate;
     const lastDay = endDate;
 
-    // Get holidays for the selected month
+    // Get holidays for the selected month (for display in the list)
     const holidays = await Holiday.findByUserAndDateRange(
       userId,
       firstDay,
@@ -78,6 +78,21 @@ router.get("/", async (req, res) => {
     // Format holiday dates for display
     holidays.forEach((holiday) => {
       holiday.holiday_date = formatDateForDisplay(holiday.holiday_date);
+    });
+
+    // Get user holidays for extended range (6 months back, 6 months forward) for calendar highlighting
+    const today = new Date();
+    const sixMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 6, 1);
+    const sixMonthsAhead = new Date(today.getFullYear(), today.getMonth() + 7, 0);
+    const allUserHolidays = await Holiday.findByUserAndDateRange(
+      userId,
+      formatDate(sixMonthsAgo),
+      formatDate(sixMonthsAhead)
+    );
+
+    // Format dates for client-side comparison
+    allUserHolidays.forEach((holiday) => {
+      holiday.holiday_date = formatDate(holiday.holiday_date);
     });
 
     // Get public holidays for the selected month
@@ -142,6 +157,7 @@ router.get("/", async (req, res) => {
       title: "Urlopy",
       currentPage: "holidays",
       holidays,
+      allUserHolidays, // Pass extended range of user holidays for calendar highlighting
       publicHolidays: displayPublicHolidays, // Pass the display-formatted list
       publicHolidaysRaw: allPublicHolidays, // Pass broader range of public holidays for client-side validation
       month,
@@ -173,6 +189,7 @@ router.get("/", async (req, res) => {
       title: "Urlopy",
       currentPage: "holidays",
       holidays: [],
+      allUserHolidays: [], // Pass empty array for extended user holidays in error case
       publicHolidays: [],
       publicHolidaysRaw: [], // Pass empty array for broader public holidays in error case
       month,
@@ -401,6 +418,21 @@ router.get("/future", async (req, res) => {
       holiday.holiday_date = formatDateForDisplay(holiday.holiday_date);
     });
 
+    // Get user holidays for extended range (6 months back, 6 months forward) for calendar highlighting
+    const todayDate = new Date();
+    const sixMonthsAgo = new Date(todayDate.getFullYear(), todayDate.getMonth() - 6, 1);
+    const sixMonthsAhead = new Date(todayDate.getFullYear(), todayDate.getMonth() + 7, 0);
+    const allUserHolidays = await Holiday.findByUserAndDateRange(
+      userId,
+      formatDate(sixMonthsAgo),
+      formatDate(sixMonthsAhead)
+    );
+
+    // Format dates for client-side comparison
+    allUserHolidays.forEach((holiday) => {
+      holiday.holiday_date = formatDate(holiday.holiday_date);
+    });
+
     // Get public holidays for the next 2 years (for future date validation)
     const currentYear = new Date().getFullYear();
     const publicHolidaysCurrentYear = await PublicHoliday.findByYear(currentYear);
@@ -411,6 +443,7 @@ router.get("/future", async (req, res) => {
       title: "Planowane urlopy",
       currentPage: "holidays",
       futureHolidays,
+      allUserHolidays, // Pass extended range of user holidays for calendar highlighting
       publicHolidays,
       isAuthenticated: req.oidc.isAuthenticated(),
       user: req.oidc.user,
@@ -422,6 +455,7 @@ router.get("/future", async (req, res) => {
       title: "Planowane urlopy",
       currentPage: "holidays",
       futureHolidays: [],
+      allUserHolidays: [], // Pass empty array for extended user holidays in error case
       publicHolidays: [],
       isAuthenticated: req.oidc.isAuthenticated(),
       user: req.oidc.user,

@@ -4,8 +4,35 @@ alwaysApply: true
 
 ## Rules
 
-- Use dateUtils.js functions for all date formatting and manipulation; always use formatDate for database operations, formatDateTimeForDisplay for user-facing timestamps, and getMonthDateRange for month date range calculations.
 - Use logger.js for logging; always use logger.info for info messages, logger.error for error messages, logger.warn for warning messages, logger.debug for debug messages, logger.trace for trace messages.
+
+## Date Handling
+
+Use `dateUtils.js` functions for ALL date operations:
+
+| Scenario | Function | Output Format | Example |
+|----------|----------|---------------|---------|
+| Database queries/params | `formatDate()` | `YYYY-MM-DD` | `formatDate(new Date())` |
+| Template display | `formatDateForDisplay()` | `YYYY-MM-DD` | `<%= formatDateForDisplay(record.date) %>` |
+| Timestamp display | `formatDateTimeForDisplay()` | Localized | `formatDateTimeForDisplay(record.created_at)` |
+| Month ranges | `getMonthDateRange()` | `{startDate, endDate}` | `getMonthDateRange(2026, 1)` |
+
+### Critical Rule: Client-side Data
+
+When passing date arrays/objects to templates for JSON serialization (e.g., `data-*` attributes, inline scripts), ALWAYS format dates explicitly:
+
+```javascript
+// WRONG - dates may serialize as ISO strings
+res.render("view", { holidays: rawHolidays });
+
+// CORRECT - format dates before passing to template
+holidays.forEach((h) => {
+  h.holiday_date = formatDate(h.holiday_date);
+});
+res.render("view", { holidays });
+```
+
+This prevents mismatches between server-formatted dates and client-side date comparisons.
 
 ## Technologies
 
@@ -26,4 +53,4 @@ alwaysApply: true
 
 - ESLint is configured for `.js` files only
 - EJS files are excluded from linting
-- Run `npm run lint` to check all JS files, `npm run lint:fix` to auto-fix issues
+- Run `npm run lint` to check all JS files.

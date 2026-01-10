@@ -48,6 +48,9 @@ const messageMap = {
     // Group-related errors
     group_has_users: "Nie można usunąć grupy, która ma przypisanych użytkowników.",
 
+    // Admin-related errors
+    cannot_demote_self: "Nie możesz zmienić swojej własnej roli. Poproś innego administratora o dokonanie tej zmiany.",
+
     // Holiday-specific errors
     invalid_date: "Proszę wybrać prawidłową datę.",
     work_hours_conflict:

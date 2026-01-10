@@ -126,12 +126,14 @@ app.use(express.urlencoded({ extended: false }));
 // Parse signed cookies for CSRF double-submit cookie pattern
 app.use(cookieParser(process.env.CSRF_COOKIE_SECRET));
 
-// Serve static files with appropriate caching
-// Versioned URLs (via versionedAsset helper) will bust cache on each deployment
+// Serve static files with environment-appropriate caching
+// Development: no cache for instant feedback on changes
+// Production: long cache with versioned URLs for cache busting on deploy
+const isDevelopment = process.env.NODE_ENV !== "production";
 app.use(
   express.static(path.join(__dirname, "public"), {
-    maxAge: "1y", // Long cache - versioned URLs will bust it
-    immutable: true,
+    maxAge: isDevelopment ? 0 : "1y", // No cache in dev, long cache in prod
+    immutable: !isDevelopment,
     etag: true,
   })
 );
@@ -522,12 +524,16 @@ app.post(
   requireAuth,
   requireAdmin,
   async (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
     try {
-      const { id } = req.params;
-      const { role } = req.body;
-
       if (!role || !["admin", "user", "manager"].includes(role)) {
         return res.status(400).send("Invalid role specified");
+      }
+
+      // Prevent admins from demoting themselves to avoid lockout scenarios
+      if (parseInt(id, 10) === req.user.id && role !== "admin") {
+        return res.redirect("/admin?error=cannot_demote_self");
       }
 
       await User.setRole(id, role);

@@ -9,12 +9,10 @@ const router = express.Router();
 const { dbAsync } = require("../db/database");
 const Holiday = require("../models/Holiday");
 const PublicHoliday = require("../models/PublicHoliday");
-const WorkHours = require("../models/WorkHours");
 const WorkLocation = require("../models/WorkLocation");
 const User = require("../models/User");
 const Group = require("../models/Group");
 const {
-  getWeekdaysInMonth,
   formatDate,
   formatDateForDisplay,
   getDayOfWeekName,
@@ -49,41 +47,25 @@ const generateDateRange = (startDate, endDate, publicHolidays = []) => {
   return dates;
 };
 
-// Display holidays page
+// Display holidays page (planning future holidays)
 router.get("/", async (req, res) => {
   try {
     // Get authenticated user ID
     const userId = req.user.id;
-    
-    // Get month and year from query parameters or use current month
-    const queryMonth = parseInt(req.query.month) || new Date().getMonth() + 1;
-    const queryYear = parseInt(req.query.year) || new Date().getFullYear();
-    
-    // Validate month and year
-    const month = Math.max(1, Math.min(12, queryMonth));
-    const year = Math.max(2020, Math.min(2030, queryYear)); // Reasonable year range
-    
-    // Get date range for the specified month
-    const { startDate, endDate } = getMonthDateRange(year, month);
-    const firstDay = startDate;
-    const lastDay = endDate;
+    const today = formatDate(new Date()); // Format as YYYY-MM-DD
 
-    // Get holidays for the selected month (for display in the list)
-    const holidays = await Holiday.findByUserAndDateRange(
-      userId,
-      firstDay,
-      lastDay
-    );
+    // Get future holidays for display in the list (all future holidays, not just current month)
+    const futureHolidays = await Holiday.findFutureHolidays(userId, today);
 
     // Format holiday dates for display
-    holidays.forEach((holiday) => {
+    futureHolidays.forEach((holiday) => {
       holiday.holiday_date = formatDateForDisplay(holiday.holiday_date);
     });
 
     // Get user holidays for extended range (6 months back, 6 months forward) for calendar highlighting
-    const today = new Date();
-    const sixMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 6, 1);
-    const sixMonthsAhead = new Date(today.getFullYear(), today.getMonth() + 7, 0);
+    const todayDate = new Date();
+    const sixMonthsAgo = new Date(todayDate.getFullYear(), todayDate.getMonth() - 6, 1);
+    const sixMonthsAhead = new Date(todayDate.getFullYear(), todayDate.getMonth() + 7, 0);
     const allUserHolidays = await Holiday.findByUserAndDateRange(
       userId,
       formatDate(sixMonthsAgo),
@@ -95,116 +77,30 @@ router.get("/", async (req, res) => {
       holiday.holiday_date = formatDate(holiday.holiday_date);
     });
 
-    // Get public holidays for the selected month
-    const rawPublicHolidays = await PublicHoliday.findByMonthAndYear(
-      month,
-      year
-    );
-
-    // Get public holidays for broader date range (for client-side validation)
+    // Get public holidays for the next 2 years (for future date validation)
     const currentYear = new Date().getFullYear();
     const publicHolidaysCurrentYear = await PublicHoliday.findByYear(currentYear);
     const publicHolidaysNextYear = await PublicHoliday.findByYear(currentYear + 1);
     const allPublicHolidays = [...publicHolidaysCurrentYear, ...publicHolidaysNextYear];
 
-    // Create a version for display formatting to be passed to the template
-    const displayPublicHolidays = rawPublicHolidays.map((h) => ({
-      ...h,
-      holiday_date: formatDateForDisplay(h.holiday_date),
-    }));
-
-    // Get work hours total for the month
-    const totalWorkHours = await WorkHours.getTotalMonthlyHours(
-      userId,
-      year,
-      month
-    );
-
-    // Get holiday count for the month
-    const holidayCount = holidays.length;
-    const publicHolidayCount = rawPublicHolidays.length; // Based on raw full list
-
-    // Calculate stats
-    const hoursPerDay = 8; // Standard work hours per day
-    const workDaysInMonth = getWeekdaysInMonth(year, month);
-
-    // Filter public holidays that fall on weekdays using the raw dates
-    const publicHolidaysOnWorkdays = rawPublicHolidays.filter((holiday) => {
-      const date = new Date(holiday.holiday_date); // Use original holiday_date
-      const dayOfWeek = date.getDay();
-      return dayOfWeek !== 0 && dayOfWeek !== 6; // 0 = Sunday, 6 = Saturday
-    });
-
-    const publicHolidaysOnWorkdaysCount = publicHolidaysOnWorkdays.length;
-    // Subtract all public holidays from required monthly hours
-    const requiredMonthlyHours =
-      (workDaysInMonth - publicHolidayCount) * hoursPerDay;
-
-    const totalHolidayHours = holidayCount * hoursPerDay;
-    // publicHolidayHours should still be based on holidays that grant a day off work
-    const publicHolidayHours = publicHolidaysOnWorkdaysCount * hoursPerDay;
-
-    // Don't include public holidays in total combined hours
-    const totalCombinedHours = totalWorkHours + totalHolidayHours;
-
-    // Calculate remaining hours - don't include public holidays in the combined hours
-    const remainingHours = Math.max(
-      0,
-      requiredMonthlyHours - totalCombinedHours
-    );
-
     res.render("holidays/index", {
-      title: "Urlopy",
+      title: "Planowanie urlopów",
       currentPage: "holidays",
-      holidays,
+      futureHolidays, // Pass future holidays for display
       allUserHolidays, // Pass extended range of user holidays for calendar highlighting
-      publicHolidays: displayPublicHolidays, // Pass the display-formatted list
       publicHolidaysRaw: allPublicHolidays, // Pass broader range of public holidays for client-side validation
-      month,
-      year,
-      stats: {
-        totalWorkHours: Math.round(totalWorkHours * 100) / 100,
-        holidayCount,
-        publicHolidayCount: publicHolidaysOnWorkdaysCount, // Changed to use workday holidays only
-        publicHolidaysOnWorkdays: publicHolidaysOnWorkdaysCount, // Count of public holidays on workdays
-        totalHolidayHours,
-        publicHolidayHours, // Hours based on workday public holidays
-        totalCombinedHours: Math.round(totalCombinedHours * 100) / 100,
-        requiredMonthlyHours, // Pass the calculated required hours
-        remainingHours: Math.round(remainingHours * 100) / 100,
-      },
       isAuthenticated: req.oidc.isAuthenticated(),
       user: req.oidc.user,
       dbUser: req.user, // Pass database user
       messages: prepareMessages(req.query),
     });
   } catch (_error) {
-    // Get month and year from query parameters or use current month for error case
-    const month = Math.max(1, Math.min(12, parseInt(req.query.month) || new Date().getMonth() + 1));
-    const year = Math.max(2020, Math.min(2030, parseInt(req.query.year) || new Date().getFullYear()));
-    const workDaysInMonth = getWeekdaysInMonth(year, month);
-    const requiredMonthlyHours = workDaysInMonth * 8;
-
     res.render("holidays/index", {
-      title: "Urlopy",
+      title: "Planowanie urlopów",
       currentPage: "holidays",
-      holidays: [],
+      futureHolidays: [],
       allUserHolidays: [], // Pass empty array for extended user holidays in error case
-      publicHolidays: [],
       publicHolidaysRaw: [], // Pass empty array for broader public holidays in error case
-      month,
-      year,
-      stats: {
-        totalWorkHours: 0,
-        holidayCount: 0,
-        publicHolidayCount: 0,
-        publicHolidaysOnWorkdays: 0,
-        totalHolidayHours: 0,
-        publicHolidayHours: 0,
-        totalCombinedHours: 0,
-        requiredMonthlyHours, // Use calculated default
-        remainingHours: requiredMonthlyHours, // Default to full required hours
-      },
       isAuthenticated: req.oidc.isAuthenticated(),
       user: req.oidc.user,
       dbUser: req.user, // Pass database user
@@ -403,66 +299,9 @@ router.get("/history", async (req, res) => {
   }
 });
 
-// Display future holidays for the user
-router.get("/future", async (req, res) => {
-  try {
-    // Get authenticated user ID
-    const userId = req.user.id;
-    const today = formatDate(new Date()); // Format as YYYY-MM-DD using our utility
-
-    // Get future holidays
-    const futureHolidays = await Holiday.findFutureHolidays(userId, today);
-
-    // Format holiday dates for display
-    futureHolidays.forEach((holiday) => {
-      holiday.holiday_date = formatDateForDisplay(holiday.holiday_date);
-    });
-
-    // Get user holidays for extended range (6 months back, 6 months forward) for calendar highlighting
-    const todayDate = new Date();
-    const sixMonthsAgo = new Date(todayDate.getFullYear(), todayDate.getMonth() - 6, 1);
-    const sixMonthsAhead = new Date(todayDate.getFullYear(), todayDate.getMonth() + 7, 0);
-    const allUserHolidays = await Holiday.findByUserAndDateRange(
-      userId,
-      formatDate(sixMonthsAgo),
-      formatDate(sixMonthsAhead)
-    );
-
-    // Format dates for client-side comparison
-    allUserHolidays.forEach((holiday) => {
-      holiday.holiday_date = formatDate(holiday.holiday_date);
-    });
-
-    // Get public holidays for the next 2 years (for future date validation)
-    const currentYear = new Date().getFullYear();
-    const publicHolidaysCurrentYear = await PublicHoliday.findByYear(currentYear);
-    const publicHolidaysNextYear = await PublicHoliday.findByYear(currentYear + 1);
-    const publicHolidays = [...publicHolidaysCurrentYear, ...publicHolidaysNextYear];
-
-    res.render("holidays/future", {
-      title: "Planowane urlopy",
-      currentPage: "holidays",
-      futureHolidays,
-      allUserHolidays, // Pass extended range of user holidays for calendar highlighting
-      publicHolidays,
-      isAuthenticated: req.oidc.isAuthenticated(),
-      user: req.oidc.user,
-      dbUser: req.user, // Pass database user
-      messages: prepareMessages(req.query),
-    });
-  } catch (_error) {
-    res.render("holidays/future", {
-      title: "Planowane urlopy",
-      currentPage: "holidays",
-      futureHolidays: [],
-      allUserHolidays: [], // Pass empty array for extended user holidays in error case
-      publicHolidays: [],
-      isAuthenticated: req.oidc.isAuthenticated(),
-      user: req.oidc.user,
-      dbUser: req.user, // Pass database user
-      messages: { error: "Wystąpił błąd podczas ładowania danych" },
-    });
-  }
+// Redirect /future to main holidays page (consolidated)
+router.get("/future", (req, res) => {
+  res.redirect("/holidays");
 });
 
 // Redirect /employees to /employees/by-date by default

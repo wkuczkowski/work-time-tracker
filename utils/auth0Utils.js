@@ -54,7 +54,8 @@ async function getManagementApiToken() {
         client_secret: auth0Config.clientSecret,
         audience: auth0Config.audience,
         grant_type: "client_credentials",
-      }
+      },
+      { timeout: 10000 }
     );
 
     managementApiToken = response.data.access_token;
@@ -96,6 +97,7 @@ async function getAuth0Users() {
             per_page: perPage,
             include_totals: true,
           },
+          timeout: 10000,
         }
       );
 
@@ -148,6 +150,7 @@ async function toggleUserBlockedStatus(userId, blocked) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        timeout: 10000,
       }
     );
 

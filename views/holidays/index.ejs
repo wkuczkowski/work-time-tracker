@@ -9,13 +9,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        Urlopy
+        Planowanie urlopów
       </h1>
       <p class="text-gray-500 mt-1 text-sm ml-[52px]">Zarządzaj swoimi urlopami i przeglądaj historię.</p>
-    </div>
-    <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100">
-      <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Miesiąc:</span>
-      <span class="font-bold text-gray-900"><%= month %>/<%= year %></span>
     </div>
   </div>
 
@@ -23,10 +19,7 @@
   <div class="mb-8">
     <div class="inline-flex items-center bg-gray-50 p-1 rounded-lg border border-gray-200 shadow-sm">
       <a href="/holidays" class="px-4 py-2 rounded-md text-sm font-bold bg-white shadow-sm text-blue-700 transition-all">
-        Bieżący miesiąc
-      </a>
-      <a href="/holidays/future" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
-        Przyszłe urlopy
+        Planowanie urlopów
       </a>
       <a href="/holidays/history" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">
         Historia urlopów
@@ -138,18 +131,18 @@
       </form>
     </div>
 
-    <!-- List of holidays -->
+    <!-- List of future holidays -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <h3 class="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
-        Twoje urlopy w tym miesiącu
+        Twoje planowane urlopy
       </h3>
 
-      <% if (holidays && holidays.length > 0) { %>
-      <div class="space-y-3">
-        <% holidays.forEach(holiday => { %>
+      <% if (futureHolidays && futureHolidays.length > 0) { %>
+      <div class="space-y-3 max-h-[calc(100vh-400px)] min-h-[200px] overflow-y-auto pr-1">
+        <% futureHolidays.forEach(holiday => { %>
         <div class="group p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all bg-white">
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -185,7 +178,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <p class="text-sm text-gray-500">Brak urlopów dla bieżącego miesiąca.</p>
+        <p class="text-sm text-gray-500">Brak zaplanowanych urlopów.</p>
       </div>
       <% } %>
     </div>
@@ -199,9 +192,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const publicHolidays = JSON.parse(formEl.getAttribute('data-public-holidays') || '[]');
   const userHolidays = JSON.parse(formEl.getAttribute('data-user-holidays') || '[]');
 
-  // Calendar state
-  let currentMonth = new Date().getMonth();
-  let currentYear = new Date().getFullYear();
+  // Calendar state - start from current month
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let currentMonth = today.getMonth();
+  let currentYear = today.getFullYear();
   let startDate = null;
   let endDate = null;
   let isSelectingEnd = false;
@@ -280,7 +275,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateButtonText(days) {
-    const btnText = submitBtn.querySelector('span') || submitBtn;
     if (days > 0) {
       submitBtn.innerHTML = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>Dodaj ${getDaysLabel(days)} urlopu`;
     } else {
@@ -369,7 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       dayCell.className = classes;
 
-      // Only allow clicking on available dates
+      // Only allow clicking on non-holiday, non-weekend, non-user-holiday dates
       if (!holiday && !weekend && !userHol) {
         dayCell.addEventListener('click', () => handleDateClick(date));
       }
@@ -450,4 +444,4 @@ document.addEventListener("DOMContentLoaded", function () {
 </style>
 
 <!-- Tailwind safelist for dynamic classes -->
-<div class="hidden bg-emerald-100 text-emerald-600 border-emerald-200 bg-blue-500 bg-blue-100 text-blue-700 bg-blue-600 bg-blue-200 bg-purple-100 text-purple-400 bg-gray-100 text-gray-400 bg-gray-300"></div>
+<div class="hidden bg-emerald-100 text-emerald-600 border-emerald-200 bg-blue-500 bg-blue-100 text-blue-700 bg-blue-600 bg-blue-200 bg-purple-100 text-purple-400 bg-gray-100 text-gray-400"></div>
